@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#ffffff">
+<link rel="manifest" href="manifest.json">
+<title>ألاسكا-2</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#ffffff;color:#111827;font-family:sans-serif;padding-bottom:88px}
+.area{max-width:460px;margin:0 auto;padding:20px 14px;font-size:15px;line-height:1.85}
+.q-top{font-weight:bold;margin-bottom:10px;color:#111827}
+.save-btn{margin-top:12px;padding:7px 14px;border-radius:16px;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;font-size:13px;cursor:pointer}
+.saved{margin-top:10px;font-size:13px;color:#059669}
+.bw{position:fixed;bottom:0;left:0;right:0;background:#ffffff;padding:8px 10px 12px}
+.b{max-width:460px;margin:0 auto;display:flex;align-items:center;gap:6px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:26px;padding:5px 8px}
+.in{flex:1;min-width:0;border:0;background:transparent;outline:none;font-size:14px;padding:6px;color:#111827}
+.ic{flex-shrink:0;width:36px;height:36px;border-radius:50%;border:1px solid #d1d5db;background:#ffffff;color:#111827;font-size:16px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.go{background:#111827;color:#ffffff;border-color:#111827}
+</style>
+</head>
+<body>
+<div class="area" id="area">
+  <div id="qTop" class="q-top"></div>
+  <div id="m"></div>
+  <div id="extra"></div>
+</div>
+
+<div class="bw">
+  <div class="b">
+    <input id="q" class="in" placeholder="اكتب هنا..." autocomplete="off">
+    <button id="g" class="ic go" type="button" title="إرسال">&#128269;</button>
+    <button id="mc" class="ic" type="button" title="تحدث صوتياً">&#127908;</button>
+  </div>
+</div>
+
+<script>
+const qInp = document.getElementById('q');
+const mBox = document.getElementById('m');
+const qTop = document.getElementById('qTop');
+const extra = document.getElementById('extra');
+let lastQ = '', lastAns = '';
+
+function getMem(){ try { return JSON.parse(localStorage.getItem('alaska2_mem')||'[]'); } catch(e){ return []; } }
+function setMem(arr){ localStorage.setItem('alaska2_mem', JSON.stringify(arr)); }
+
+function searchLocalMem(text){
+  const mem = getMem();
+  const words = text.split(/\s+/).filter(w => w.length >= 2);
+  for(const item of mem){
+    if(words.some(w => item.q.includes(w) || item.a.includes(w))) return item.a;
+  }
+  return '';
+}
+
+function speakText(txt){
+  if(!txt || !('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(txt);
+  u.lang = 'ar-SA';
+  speechSynthesis.speak(u);
+}
+
+async function askQuery(text, voiceMode){
+  const clean = text.trim();
+  if(!clean) return;
+  lastQ = clean;
+  qInp.value = '';
+  qTop.textContent = clean;
+  mBox.textContent = 'جاري الرد...';
+  extra.innerHTML = '';
+
+  const localHit = searchLocalMem(clean);
+  if(localHit){
+    lastAns = localHit;
+    mBox.textContent = localHit;
+    if(voiceMode) speakText(localHit);
+    return;
+  }
+
+  try {
+    const res = await fetch('https://api.duckduckgo.com/?q=' + encodeURIComponent(clean) + '&format=json&no_html=1');
+    const data = await res.json();
+    const ans = (data && data.AbstractText) ? data.AbstractText : ('لم أجد ملخصاً مباشراً حول (' + clean + ').');
+    lastAns = ans;
+    mBox.textContent = ans;
+    if(data && data.AbstractText){
+      const btn = document.createElement('button');
+      btn.className = 'save-btn';
+      btn.type = 'button';
+      btn.textContent = 'حفظ في الذاكرة';
+      btn.onclick = () => {
+        const mem = getMem();
+        mem.unshift({q: lastQ, a: lastAns});
+        setMem(mem.slice(0, 100));
+        extra.innerHTML = '<div class="saved">تم الحفظ في الذاكرة المحلية</div>';
+      };
+      extra.appendChild(btn);
+    }
+    if(voiceMode) speakText(ans);
+  } catch(e){
+    const errMsg = 'تعذر الوصول إلى الشبكة حالياً.';
+    mBox.textContent = errMsg;
+    if(voiceMode) speakText(errMsg);
+  }
+}
+
+document.getElementById('g').onclick = () => askQuery(qInp.value, false);
+qInp.onkeydown = (e) => { if(e.key === 'Enter'){ e.preventDefault(); askQuery(qInp.value, false); } };
+
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+document.getElementById('mc').onclick = () => {
+  if(!SR){ alert('المتصفح لا يدعم الميكروفون المباشر'); return; }
+  const rec = new SR();
+  rec.lang = 'ar-SA';
+  rec.onresult = (e) => {
+    const spoken = e.results[0][0].transcript;
+    askQuery(spoken, true);
+  };
+  rec.onerror = () => alert('تعذر تشغيل الميكروفون');
+  rec.start();
+};
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
