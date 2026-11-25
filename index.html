@@ -188,7 +188,7 @@ async function askQuery(text, voiceMode){
   aiTextNode.textContent = '...';
   const contents = chat.messages.slice(0, -1).slice(-16).map(m => ({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.text }] }));
   try {
-    const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse&key=' + encodeURIComponent(apiKey);
+    const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:streamGenerateContent?alt=sse&key=' + encodeURIComponent(apiKey);
     const res = await fetch(url, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ systemInstruction: { parts: [{ text: 'أنت مساعد ذكي ودقيق وسريع يُدعى ألاسكا-2. قدّم إجابات واضحة وموثوقة ومباشرة، وإذا لم تكن متأكداً من معلومة فوضّح ذلك بوضوح دون اختلاق.' }] }, contents })
