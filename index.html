@@ -8,125 +8,234 @@
 <title>ألاسكا-2</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#ffffff;color:#111827;font-family:sans-serif;padding-bottom:88px}
-.area{max-width:460px;margin:0 auto;padding:20px 14px;font-size:15px;line-height:1.85}
-.q-top{font-weight:bold;margin-bottom:10px;color:#111827}
-.save-btn{margin-top:12px;padding:7px 14px;border-radius:16px;border:1px solid #d1d5db;background:#f3f4f6;color:#111827;font-size:13px;cursor:pointer}
-.saved{margin-top:10px;font-size:13px;color:#059669}
-.bw{position:fixed;bottom:0;left:0;right:0;background:#ffffff;padding:8px 10px 12px}
-.b{max-width:460px;margin:0 auto;display:flex;align-items:center;gap:6px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:26px;padding:5px 8px}
+body{margin:0;background:#ffffff;color:#111827;font-family:sans-serif;padding-bottom:96px}
+.topbar{position:sticky;top:0;z-index:10;background:#ffffff;border-bottom:1px solid #e5e7eb;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.brand{font-weight:bold;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top-actions{display:flex;align-items:center;gap:6px}
+.tbtn{border:1px solid #d1d5db;background:#f9fafb;color:#111827;border-radius:16px;padding:6px 10px;font-size:12px;cursor:pointer;white-space:nowrap}
+.drawer{display:none;position:fixed;inset:0;z-index:30;background:rgba(17,24,39,0.4)}
+.drawer.open{display:flex}
+.drawer-panel{width:290px;max-width:85vw;height:100%;background:#ffffff;padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e5e7eb;padding-bottom:8px}
+.new-chat{width:100%;padding:9px 12px;border-radius:12px;border:0;background:#111827;color:#ffffff;font-size:13px;font-weight:bold;cursor:pointer}
+.chat-item{padding:9px 10px;border-radius:10px;border:1px solid #e5e7eb;background:#f9fafb;display:flex;align-items:center;justify-content:space-between;gap:6px;cursor:pointer;font-size:13px}
+.chat-item.active{background:#eef2ff;border-color:#6366f1;font-weight:bold}
+.del-btn{border:0;background:transparent;color:#dc2626;font-size:14px;cursor:pointer;padding:2px 6px}
+.settings-box{border-top:1px solid #e5e7eb;padding-top:10px;display:flex;flex-direction:column;gap:8px;font-size:12px}
+.settings-box label{display:flex;flex-direction:column;gap:4px;color:#374151}
+.settings-box select,.settings-box input{padding:7px 9px;border-radius:8px;border:1px solid #d1d5db;font-size:12px;background:#ffffff;color:#111827}
+.area{max-width:520px;margin:0 auto;padding:16px 14px;display:flex;flex-direction:column;gap:12px}
+.msg{padding:11px 14px;border-radius:16px;font-size:15px;line-height:1.8;white-space:pre-wrap;word-wrap:break-word}
+.msg.user{background:#111827;color:#ffffff;align-self:flex-start;border-bottom-right-radius:4px;max-width:88%}
+.msg.ai{background:#f3f4f6;color:#111827;align-self:stretch;border-bottom-left-radius:4px}
+.msg-tools{display:flex;gap:8px;margin-top:6px}
+.mini-btn{border:1px solid #d1d5db;background:#ffffff;color:#111827;border-radius:12px;padding:3px 9px;font-size:11px;cursor:pointer}
+.key-banner{background:#fffbeb;border:1px solid #fcd34d;border-radius:12px;padding:10px 12px;font-size:12px;color:#92400e;display:flex;flex-direction:column;gap:6px}
+.key-row{display:flex;gap:6px}
+.key-row input{flex:1;padding:7px 9px;border-radius:8px;border:1px solid #d97706;font-size:12px}
+.key-row button{padding:7px 12px;border-radius:8px;border:0;background:#111827;color:#ffffff;font-size:12px;cursor:pointer}
+.bw{position:fixed;bottom:0;left:0;right:0;background:#ffffff;border-top:1px solid #f3f4f6;padding:8px 10px 12px}
+.b{max-width:520px;margin:0 auto;display:flex;align-items:center;gap:6px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:26px;padding:5px 8px}
 .in{flex:1;min-width:0;border:0;background:transparent;outline:none;font-size:14px;padding:6px;color:#111827}
 .ic{flex-shrink:0;width:36px;height:36px;border-radius:50%;border:1px solid #d1d5db;background:#ffffff;color:#111827;font-size:16px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
 .go{background:#111827;color:#ffffff;border-color:#111827}
 </style>
 </head>
 <body>
-<div class="area" id="area">
-  <div id="qTop" class="q-top"></div>
-  <div id="m"></div>
-  <div id="extra"></div>
+<div class="topbar">
+  <button id="openDrawer" class="tbtn" type="button">المحادثات والأصوات</button>
+  <div id="chatTitle" class="brand">ألاسكا-2</div>
+  <button id="quickNew" class="tbtn" type="button">+ جديدة</button>
 </div>
-
-<div class="bw">
-  <div class="b">
-    <input id="q" class="in" placeholder="اكتب هنا..." autocomplete="off">
-    <button id="g" class="ic go" type="button" title="إرسال">&#128269;</button>
-    <button id="mc" class="ic" type="button" title="تحدث صوتياً">&#127908;</button>
+<div id="drawer" class="drawer">
+  <div class="drawer-panel">
+    <div class="drawer-head">
+      <strong>محادثات ألاسكا-2</strong>
+      <button id="closeDrawer" class="tbtn" type="button">إغلاق</button>
+    </div>
+    <button id="newChatBtn" class="new-chat" type="button">محادثة جديدة</button>
+    <div id="chatList"></div>
+    <div class="settings-box">
+      <strong>إعدادات الصوت والدقة</strong>
+      <label>اختر الصوت:<select id="voiceSelect"></select></label>
+      <label>سرعة النطق:<select id="rateSelect"><option value="0.9">هادئة</option><option value="1" selected>طبيعية</option><option value="1.15">سريعة</option><option value="1.3">سريعة جداً</option></select></label>
+      <label>مفتاح Gemini API:<input id="apiKeyInput" type="password" placeholder="الصق مفتاح Gemini هنا"></label>
+      <button id="saveSettingsBtn" class="tbtn" type="button">حفظ الإعدادات</button>
+    </div>
   </div>
 </div>
-
+<div class="area" id="area">
+  <div id="keyBanner" class="key-banner" style="display:none">
+    <div>أدخل مفتاح Gemini API مرة واحدة لتفعيل الردود الفورية والدقيقة:</div>
+    <div class="key-row"><input id="quickKeyInp" type="password" placeholder="AIza..."><button id="quickKeyBtn" type="button">حفظ</button></div>
+  </div>
+  <div id="msgs"></div>
+</div>
+<div class="bw"><div class="b"><input id="q" class="in" placeholder="اسأل ألاسكا-2..." autocomplete="off"><button id="g" class="ic go" type="button" title="إرسال">&#10148;</button><button id="mc" class="ic" type="button" title="تحدث صوتياً">&#127908;</button></div></div>
 <script>
+const STORAGE_CHATS = 'alaska2_chats_v1';
+const STORAGE_ACTIVE = 'alaska2_active_chat_v1';
+const STORAGE_KEY = 'alaska2_gemini_key_v1';
+const STORAGE_VOICE = 'alaska2_voice_uri_v1';
+const STORAGE_RATE = 'alaska2_voice_rate_v1';
+const msgsEl = document.getElementById('msgs');
 const qInp = document.getElementById('q');
-const mBox = document.getElementById('m');
-const qTop = document.getElementById('qTop');
-const extra = document.getElementById('extra');
-let lastQ = '', lastAns = '';
+const chatListEl = document.getElementById('chatList');
+const chatTitleEl = document.getElementById('chatTitle');
+const drawerEl = document.getElementById('drawer');
+const voiceSelect = document.getElementById('voiceSelect');
+const rateSelect = document.getElementById('rateSelect');
+const apiKeyInput = document.getElementById('apiKeyInput');
+const keyBanner = document.getElementById('keyBanner');
+let chats = [], activeId = '', voices = [], busy = false;
 
-function getMem(){ try { return JSON.parse(localStorage.getItem('alaska2_mem')||'[]'); } catch(e){ return []; } }
-function setMem(arr){ localStorage.setItem('alaska2_mem', JSON.stringify(arr)); }
-
-function searchLocalMem(text){
-  const mem = getMem();
-  const words = text.split(/\s+/).filter(w => w.length >= 2);
-  for(const item of mem){
-    if(words.some(w => item.q.includes(w) || item.a.includes(w))) return item.a;
+function loadChats(){
+  try { chats = JSON.parse(localStorage.getItem(STORAGE_CHATS) || '[]'); } catch(e){ chats = []; }
+  if(!Array.isArray(chats) || chats.length === 0){
+    const first = { id: 'c_' + Date.now(), title: 'محادثة جديدة', messages: [] };
+    chats = [first]; activeId = first.id; saveChats();
+  } else {
+    activeId = localStorage.getItem(STORAGE_ACTIVE) || chats[0].id;
+    if(!chats.some(c => c.id === activeId)) activeId = chats[0].id;
   }
-  return '';
 }
-
+function saveChats(){ localStorage.setItem(STORAGE_CHATS, JSON.stringify(chats)); localStorage.setItem(STORAGE_ACTIVE, activeId); }
+function getActiveChat(){ return chats.find(c => c.id === activeId) || chats[0]; }
+function createNewChat(){
+  const item = { id: 'c_' + Date.now(), title: 'محادثة جديدة', messages: [] };
+  chats.unshift(item); activeId = item.id; saveChats(); renderChatList(); renderMessages(); drawerEl.classList.remove('open');
+}
+function deleteChat(id, ev){
+  ev.stopPropagation();
+  if(chats.length === 1){ chats[0].title = 'محادثة جديدة'; chats[0].messages = []; saveChats(); renderChatList(); renderMessages(); return; }
+  chats = chats.filter(c => c.id !== id);
+  if(activeId === id) activeId = chats[0].id;
+  saveChats(); renderChatList(); renderMessages();
+}
+function renderChatList(){
+  chatListEl.innerHTML = '';
+  for(const c of chats){
+    const row = document.createElement('div');
+    row.className = 'chat-item' + (c.id === activeId ? ' active' : '');
+    row.onclick = () => { activeId = c.id; saveChats(); renderChatList(); renderMessages(); drawerEl.classList.remove('open'); };
+    const span = document.createElement('span'); span.textContent = c.title || 'محادثة';
+    const del = document.createElement('button'); del.className = 'del-btn'; del.type = 'button'; del.textContent = '×';
+    del.onclick = (e) => deleteChat(c.id, e);
+    row.appendChild(span); row.appendChild(del); chatListEl.appendChild(row);
+  }
+}
 function speakText(txt){
-  if(!txt || !('speechSynthesis' in window)) return;
+  const clean = (txt || '').trim();
+  if(!clean || !('speechSynthesis' in window)) return;
   speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(txt);
-  u.lang = 'ar-SA';
+  const u = new SpeechSynthesisUtterance(clean);
+  const chosenUri = voiceSelect.value;
+  if(chosenUri){ const v = voices.find(item => item.voiceURI === chosenUri); if(v) u.voice = v; }
+  u.lang = (u.voice && u.voice.lang) ? u.voice.lang : 'ar-SA';
+  u.rate = parseFloat(rateSelect.value || '1');
   speechSynthesis.speak(u);
 }
-
-async function askQuery(text, voiceMode){
-  const clean = text.trim();
-  if(!clean) return;
-  lastQ = clean;
-  qInp.value = '';
-  qTop.textContent = clean;
-  mBox.textContent = 'جاري الرد...';
-  extra.innerHTML = '';
-
-  const localHit = searchLocalMem(clean);
-  if(localHit){
-    lastAns = localHit;
-    mBox.textContent = localHit;
-    if(voiceMode) speakText(localHit);
-    return;
-  }
-
-  try {
-    const res = await fetch('https://api.duckduckgo.com/?q=' + encodeURIComponent(clean) + '&format=json&no_html=1');
-    const data = await res.json();
-    const ans = (data && data.AbstractText) ? data.AbstractText : ('لم أجد ملخصاً مباشراً حول (' + clean + ').');
-    lastAns = ans;
-    mBox.textContent = ans;
-    if(data && data.AbstractText){
-      const btn = document.createElement('button');
-      btn.className = 'save-btn';
-      btn.type = 'button';
-      btn.textContent = 'حفظ في الذاكرة';
-      btn.onclick = () => {
-        const mem = getMem();
-        mem.unshift({q: lastQ, a: lastAns});
-        setMem(mem.slice(0, 100));
-        extra.innerHTML = '<div class="saved">تم الحفظ في الذاكرة المحلية</div>';
-      };
-      extra.appendChild(btn);
-    }
-    if(voiceMode) speakText(ans);
-  } catch(e){
-    const errMsg = 'تعذر الوصول إلى الشبكة حالياً.';
-    mBox.textContent = errMsg;
-    if(voiceMode) speakText(errMsg);
-  }
+function populateVoices(){
+  if(!('speechSynthesis' in window)) return;
+  voices = speechSynthesis.getVoices() || [];
+  voiceSelect.innerHTML = '';
+  const defOpt = document.createElement('option'); defOpt.value = ''; defOpt.textContent = 'صوت النظام التلقائي';
+  voiceSelect.appendChild(defOpt);
+  const sorted = [...voices].sort((a, b) => ((a.lang||'').toLowerCase().startsWith('ar')?0:1) - ((b.lang||'').toLowerCase().startsWith('ar')?0:1));
+  sorted.forEach((v, idx) => {
+    const opt = document.createElement('option'); opt.value = v.voiceURI;
+    const isAr = (v.lang || '').toLowerCase().startsWith('ar');
+    opt.textContent = (isAr ? 'عربي - ' : '') + (v.name || ('صوت ' + (idx + 1))) + ' (' + v.lang + ')';
+    voiceSelect.appendChild(opt);
+  });
+  const savedUri = localStorage.getItem(STORAGE_VOICE) || '';
+  if(savedUri && sorted.some(v => v.voiceURI === savedUri)) voiceSelect.value = savedUri;
 }
-
+function renderMessages(){
+  const chat = getActiveChat();
+  chatTitleEl.textContent = chat.title || 'ألاسكا-2';
+  msgsEl.innerHTML = '';
+  for(const m of chat.messages){
+    const div = document.createElement('div'); div.className = 'msg ' + (m.role === 'user' ? 'user' : 'ai');
+    const txt = document.createElement('div'); txt.textContent = m.text; div.appendChild(txt);
+    if(m.role === 'model' && m.text){
+      const tools = document.createElement('div'); tools.className = 'msg-tools';
+      const spk = document.createElement('button'); spk.className = 'mini-btn'; spk.type = 'button'; spk.textContent = 'استماع';
+      spk.onclick = () => speakText(m.text);
+      tools.appendChild(spk); div.appendChild(tools);
+    }
+    msgsEl.appendChild(div);
+  }
+  window.scrollTo(0, document.body.scrollHeight);
+}
+function getApiKey(){ return (localStorage.getItem(STORAGE_KEY) || '').trim(); }
+function syncKeyUI(){ const k = getApiKey(); apiKeyInput.value = k; keyBanner.style.display = k ? 'none' : 'flex'; }
+function saveApiKeyValue(val){ const clean = (val || '').trim(); if(clean) localStorage.setItem(STORAGE_KEY, clean); else localStorage.removeItem(STORAGE_KEY); syncKeyUI(); }
+async function askQuery(text, voiceMode){
+  if(busy) return;
+  const clean = (text || '').trim();
+  if(!clean) return;
+  const apiKey = getApiKey();
+  if(!apiKey){ keyBanner.style.display = 'flex'; alert('يرجى إدخال مفتاح Gemini API أولاً.'); return; }
+  busy = true; qInp.value = '';
+  const chat = getActiveChat();
+  if(chat.messages.length === 0) chat.title = clean.slice(0, 28);
+  chat.messages.push({ role: 'user', text: clean });
+  const aiMsg = { role: 'model', text: '' };
+  chat.messages.push(aiMsg);
+  saveChats(); renderChatList(); renderMessages();
+  const aiTextNode = msgsEl.lastElementChild.firstElementChild;
+  aiTextNode.textContent = '...';
+  const contents = chat.messages.slice(0, -1).slice(-16).map(m => ({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.text }] }));
+  try {
+    const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse&key=' + encodeURIComponent(apiKey);
+    const res = await fetch(url, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ systemInstruction: { parts: [{ text: 'أنت مساعد ذكي ودقيق وسريع يُدعى ألاسكا-2. قدّم إجابات واضحة وموثوقة ومباشرة، وإذا لم تكن متأكداً من معلومة فوضّح ذلك بوضوح دون اختلاق.' }] }, contents })
+    });
+    if(!res.ok){ const errData = await res.json().catch(() => ({})); throw new Error(errData.error?.message || 'تعذر الاتصال بالخدمة'); }
+    const reader = res.body.getReader(); const decoder = new TextDecoder(); let buffer = ''; aiTextNode.textContent = '';
+    while(true){
+      const { value, done } = await reader.read(); if(done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n'); buffer = lines.pop() || '';
+      for(const line of lines){
+        if(!line.startsWith('data: ')) continue;
+        const jsonStr = line.slice(6).trim(); if(!jsonStr || jsonStr === '[DONE]') continue;
+        try {
+          const delta = JSON.parse(jsonStr).candidates?.[0]?.content?.parts?.[0]?.text || '';
+          if(delta){ aiMsg.text += delta; aiTextNode.textContent = aiMsg.text; window.scrollTo(0, document.body.scrollHeight); }
+        } catch(e){}
+      }
+    }
+    if(!aiMsg.text.trim()) aiMsg.text = 'لم يرد نموذج الذكاء الاصطناعي بنص واضح، جرّب إعادة السؤال.';
+    aiTextNode.textContent = aiMsg.text; saveChats(); renderMessages();
+    if(voiceMode) speakText(aiMsg.text);
+  } catch(err){
+    aiMsg.text = 'حدث خطأ: ' + (err.message || 'تعذر إتمام الطلب'); aiTextNode.textContent = aiMsg.text;
+    saveChats(); renderMessages(); if(voiceMode) speakText(aiMsg.text);
+  } finally { busy = false; }
+}
+document.getElementById('openDrawer').onclick = () => drawerEl.classList.add('open');
+document.getElementById('closeDrawer').onclick = () => drawerEl.classList.remove('open');
+drawerEl.onclick = (e) => { if(e.target === drawerEl) drawerEl.classList.remove('open'); };
+document.getElementById('newChatBtn').onclick = createNewChat;
+document.getElementById('quickNew').onclick = createNewChat;
+document.getElementById('saveSettingsBtn').onclick = () => { localStorage.setItem(STORAGE_VOICE, voiceSelect.value); localStorage.setItem(STORAGE_RATE, rateSelect.value); saveApiKeyValue(apiKeyInput.value); drawerEl.classList.remove('open'); };
+document.getElementById('quickKeyBtn').onclick = () => saveApiKeyValue(document.getElementById('quickKeyInp').value);
 document.getElementById('g').onclick = () => askQuery(qInp.value, false);
 qInp.onkeydown = (e) => { if(e.key === 'Enter'){ e.preventDefault(); askQuery(qInp.value, false); } };
-
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 document.getElementById('mc').onclick = () => {
   if(!SR){ alert('المتصفح لا يدعم الميكروفون المباشر'); return; }
-  const rec = new SR();
-  rec.lang = 'ar-SA';
-  rec.onresult = (e) => {
-    const spoken = e.results[0][0].transcript;
-    askQuery(spoken, true);
-  };
-  rec.onerror = () => alert('تعذر تشغيل الميكروفون');
-  rec.start();
+  const rec = new SR(); rec.lang = 'ar-SA';
+  rec.onresult = (e) => askQuery(e.results[0][0].transcript, true);
+  rec.onerror = () => alert('تعذر تشغيل الميكروفون'); rec.start();
 };
-
-if('serviceWorker' in navigator){
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(()=>{});
-  });
-}
+if('speechSynthesis' in window){ populateVoices(); speechSynthesis.onvoiceschanged = populateVoices; }
+const savedRate = localStorage.getItem(STORAGE_RATE); if(savedRate) rateSelect.value = savedRate;
+loadChats(); syncKeyUI(); renderChatList(); renderMessages();
+if('serviceWorker' in navigator){ window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(()=>{}); }); }
 </script>
 </body>
 </html>
